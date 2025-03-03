@@ -26,6 +26,9 @@ function Login() {
     };
 
     try {
+
+      console.log(username)
+      console.log(password)
       setLoading(true);
       setMessage("");
       setError(false);
@@ -43,6 +46,8 @@ function Login() {
 
       navigate("/dashboard"); // Redirect to dashboard
     } catch (error) {
+
+      console.log(error)
       setMessage("Failed to log in. Please check your credentials.");
       setError(true);
     } finally {
