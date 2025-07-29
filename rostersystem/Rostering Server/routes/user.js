@@ -31,27 +31,14 @@ router.post(`/signin`, express.json(), async (request, respond) => {
         try {
             const hashedPassword = await hashPassword(password)
             connection.query(selectQuery, [username], async (err, results, fields) => {
-
-                if (results.length === 0) {
-                    let jsonResponse = { error: false, message: `Wrong username or password` }
-                    return respond.status(400).json(jsonResponse)
+                if (err) {
+                    console.error('MySQL error:', err);
+                    return respond.status(500).json({ error: true, message: 'Database error' });
                 }
 
-                else {
-                    const extractedPassword = results[0].password
-
-                    const passwordMatch = await bcrypt.compare(password, extractedPassword)
-                    if (!passwordMatch) {
-                        let jsonResponse = { error: false, message: `Wrong username or password` }
-                        return respond.status(400).json(jsonResponse)
-                    }
-                    else {
-                        const token = jwt.sign({username}, SECRET_KEY, {expiresIn: `1h`})
-                        let jsonResponse = { error: false, message: `Successfully logged in as ${username}`, token : token }
-                        return respond.status(200).json(jsonResponse)
-                    }
-                }
-            })
+                if (!results || results.length === 0) {
+                    return respond.status(400).json({ error: false, message: `Wrong username or password` });
+                }})
         }
 
         catch (err) {
